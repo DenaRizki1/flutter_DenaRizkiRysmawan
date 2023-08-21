@@ -6,7 +6,7 @@ void main() {
 
 void persegi() {
   print("MASUKAN SISI PERSEGI : ");
-  int s = int.parse(stdin.readLineSync()!);
+  int s = int.parse(stdin.readLineSync() ?? "0");
 
   print("\nRUMUS KELILING PERSEGI : S + S + S + S");
   int k = s + s + s + s;
@@ -19,9 +19,9 @@ void persegi() {
 
 void persegiPanjang() {
   print("MASUKAN PANJANG PERSEGI PANJANG : ");
-  int pa = int.parse(stdin.readLineSync()!);
+  int pa = int.parse(stdin.readLineSync() ?? "0");
   print("MASUKAN LEBAR PERSEGI PANJANG : ");
-  int le = int.parse(stdin.readLineSync()!);
+  int le = int.parse(stdin.readLineSync() ?? "0");
 
   print("Rumus Dari Luas Persegi Panjang Adalah : L = Panjang x Lebar");
   int L = pa * le;
