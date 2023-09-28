@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -17,29 +18,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  TextEditingController _EcNama = TextEditingController();
-  TextEditingController _EcNomor = TextEditingController();
-
   final _formKey = GlobalKey<FormState>();
 
   List<Map<String, dynamic>> contact = [];
-  bool edit = false;
+
   int currendIndex = 0;
-  DateTime? selectedDate;
-  Color _currenColor = Colors.red;
-  String fileName = "";
-
-  PlatformFile? imageFile;
-
-  void _pickFile() async {
-    final result = await FilePicker.platform.pickFiles();
-    if (result == null) return;
-
-    final file = result.files.first;
-    fileName = file.name;
-    imageFile = file;
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +127,7 @@ class _MyAppState extends State<MyApp> {
                           }
                           return null;
                         },
-                        controller: _EcNama,
+                        controller: contactProvider.EcNama,
                         textCapitalization: TextCapitalization.words,
                         decoration: InputDecoration(
                           label: const Text("Nama"),
@@ -167,7 +150,7 @@ class _MyAppState extends State<MyApp> {
                           }
                           return null;
                         },
-                        controller: _EcNomor,
+                        controller: contactProvider.EcNomor,
                         keyboardType: TextInputType.number,
                         textCapitalization: TextCapitalization.words,
                         decoration: InputDecoration(
@@ -190,10 +173,7 @@ class _MyAppState extends State<MyApp> {
                           ).then(
                             (value) {
                               if (value != null) {
-                                selectedDate = value;
-                                log(selectedDate.toString());
-
-                                setState(() {});
+                                contactProvider.selectDate(value);
                               }
                             },
                           );
@@ -202,11 +182,13 @@ class _MyAppState extends State<MyApp> {
                           children: [
                             const Icon(Icons.calendar_month),
                             const SizedBox(width: 10),
-                            selectedDate == null
+                            contactProvider.selectedDate == null
                                 ? const Text("Pilih Tanggal")
-                                : Text(
-                                    "${selectedDate!.day}-${selectedDate!.month}-${selectedDate!.year}",
-                                  ),
+                                : Consumer<Contact>(
+                                    builder: (context, value, child) => Text(
+                                      "${contactProvider.selectedDate!.day}-${contactProvider.selectedDate!.month}-${contactProvider.selectedDate!.year}",
+                                    ),
+                                  )
                           ],
                         ),
                       ),
@@ -221,10 +203,9 @@ class _MyAppState extends State<MyApp> {
                                     return AlertDialog(
                                       title: const Text("Pilih Warna"),
                                       content: BlockPicker(
-                                        pickerColor: _currenColor,
+                                        pickerColor: contactProvider.currenColor,
                                         onColorChanged: (value) {
-                                          _currenColor = value;
-                                          log(_currenColor.toString());
+                                          contactProvider.currenColor = value;
                                         },
                                       ),
                                       actions: [
@@ -246,15 +227,15 @@ class _MyAppState extends State<MyApp> {
                           Container(
                             height: 35,
                             width: 35,
-                            color: _currenColor,
+                            color: contactProvider.currenColor,
                           )
                         ],
                       ),
                       const SizedBox(height: 12),
-                      imageFile == null
+                      contactProvider.imageFile == null
                           ? InkWell(
                               onTap: () {
-                                _pickFile();
+                                contactProvider.pickFile();
                               },
                               child: Container(
                                 width: double.infinity,
@@ -283,13 +264,13 @@ class _MyAppState extends State<MyApp> {
                                     border: Border.all(color: Colors.black),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
-                                  child: Image.file(File(imageFile!.path.toString())),
+                                  child: Image.file(File(contactProvider.imageFile!.path.toString())),
                                 ),
                                 Align(
                                   alignment: Alignment.topRight,
                                   child: InkWell(
                                     onTap: () {
-                                      imageFile = null;
+                                      contactProvider.imageFile = null;
                                       setState(() {});
                                     },
                                     child: Container(
@@ -316,7 +297,7 @@ class _MyAppState extends State<MyApp> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          edit
+                          contactProvider.edit
                               ? ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -326,14 +307,7 @@ class _MyAppState extends State<MyApp> {
                                     ),
                                   ),
                                   onPressed: () {
-                                    _EcNama.clear();
-                                    _EcNomor.clear();
-                                    selectedDate = null;
-                                    fileName = "";
-                                    imageFile = null;
-
-                                    edit = false;
-                                    setState(() {});
+                                    contactProvider.cancleEdit();
                                   },
                                   child: const Text("Cancle Edit"),
                                 )
@@ -348,46 +322,16 @@ class _MyAppState extends State<MyApp> {
                               ),
                             ),
                             onPressed: () {
-                              log(contactProvider.contact.toString());
                               Map<String, dynamic> contacts = {};
                               if (contact.isEmpty) {
                                 contact.clear();
                               }
                               if (_formKey.currentState!.validate()) {
-                                if (!edit) {
-                                  contacts['nama'] = _EcNama.text;
-                                  contacts['nomor'] = _EcNomor.text;
-                                  contacts['tanggal'] = selectedDate;
-                                  contacts['color'] = _currenColor;
-                                  contacts['file_name'] = fileName;
-                                  contacts['image_file'] = imageFile;
-
-                                  contactProvider.addContact(contacts);
-
-                                  _EcNama.clear();
-                                  _EcNomor.clear();
-                                  selectedDate = null;
-                                  fileName = "";
-                                  imageFile = null;
+                                if (contactProvider.edit == false) {
+                                  contactProvider.addContact();
                                 } else {
-                                  contacts = contactProvider.contact[currendIndex];
-                                  contacts['nama'] = _EcNama.text;
-                                  contacts['nomor'] = _EcNomor.text;
-                                  contacts['tanggal'] = selectedDate;
-                                  contacts['color'] = _currenColor;
-                                  contacts['file_name'] = fileName;
-                                  contacts['image_file'] = imageFile;
-
-                                  contactProvider.editContact(contacts, currendIndex);
-                                  _EcNama.clear();
-                                  _EcNomor.clear();
-                                  selectedDate = null;
-                                  fileName = "";
-                                  imageFile = null;
-                                  edit = false;
-                                  log(edit.toString());
+                                  contactProvider.editContact(currendIndex);
                                 }
-                                setState(() {});
                               }
                             },
                             child: const Text("Submit"),
@@ -470,12 +414,7 @@ class _MyAppState extends State<MyApp> {
                           InkWell(
                             onTap: () {
                               currendIndex = index;
-                              _EcNama.text = contactProvider.contact[index]['nama'];
-                              _EcNomor.text = contactProvider.contact[index]['nomor'];
-                              selectedDate = contactProvider.contact[index]['tanggal'];
-                              _currenColor = contactProvider.contact[index]['color'];
-                              imageFile = contactProvider.contact[index]['image_file'];
-                              edit = true;
+                              contactProvider.selectEditContact(currendIndex);
                               setState(() {});
                             },
                             child: const Icon(

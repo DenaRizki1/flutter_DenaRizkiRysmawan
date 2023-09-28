@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class OpenImage extends StatefulWidget {
   String? image;
@@ -16,7 +13,7 @@ class _OpenImageState extends State<OpenImage> {
   @override
   void initState() {
     dataImage = widget.image;
-    // TODO: implement initState
+
     super.initState();
   }
 
