@@ -1,3 +1,3 @@
-Saya dapat memahami bagaimana cara mengimplementasikan widget widget yang ada di flutter
-
-Saya dapat membuat aplikasi sederhana menggunakan flutter
+Layout merupakan sebuah widget yang digunakan untuk mengatur tata letak widget. Layout terdiri dari Single-child Layout dan Multi-Child Layout, single child layout hanya dapat mengeluarkan 1 buah widget saja, sedangkan multi-child layout dapat mengatur banyak widget.
+Contoh dari Single-Child Layout terdiri dari, container yang berbentuk sebuah box dan membungkus widget lain didalamnya, box ini memiliki berbagai macam widget yang dapat diatur seperti margin, padding, border, color, dan banyak hal lainnya. lalu ada center dimana hampir sama seperti container tetapi center meletakkan widget dibagian tengah-tengah. selanjutnya ada SizedBox, sizedbox berbentuk seperti container tetapi lebih sederhana lagi.
+Contoh dari Multi-Child Layout terdiri dari, Column dimana column dapat mengatur widget secara vertikal ke bawah, pada column kita dapat memasukkan single-child layout. Lalu ada row yang dapat mengatur widget secara horizontal, selanjutnya ada listview dimana listview berbentuk seperti column tetapi dapat discroll ke bawah, dan terakhir ada gridview yang dapat membentuk widget berbentuk galeri-galeri.
